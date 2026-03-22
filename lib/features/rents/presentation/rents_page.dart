@@ -101,6 +101,15 @@ class RentsPage extends ConsumerWidget {
                                         DateFormat('dd.MM.yyyy').format(DateTime.parse(rent.rentDate)),
                                         style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                                       ),
+                                      if (rent.increaseRate != null) ...[
+                                        const SizedBox(width: 12),
+                                        const Icon(Icons.trending_up, size: 14, color: AppColors.textSecondary),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          '%${rent.increaseRate!.toStringAsFixed(2)}',
+                                          style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                                        ),
+                                      ],
                                     ],
                                   ),
                                   if (canUpdate || canDelete) ...[
@@ -169,6 +178,9 @@ class RentsPage extends ConsumerWidget {
   void _showFormDialog(BuildContext context, WidgetRef ref, {Rent? rent}) {
     final realEstateIdCtrl = TextEditingController(text: rent?.realEstateId.toString());
     final amountCtrl = TextEditingController(text: rent?.rentAmount.toString());
+    final increaseRateCtrl = TextEditingController(
+      text: rent?.increaseRate != null ? rent!.increaseRate!.toString() : '',
+    );
     String currency = rent?.currency ?? 'TRY';
     DateTime selectedDate = rent != null ? DateTime.parse(rent.rentDate) : DateTime.now();
     final formKey = GlobalKey<FormState>();
@@ -233,15 +245,34 @@ class RentsPage extends ConsumerWidget {
                       ],
                       onChanged: (v) => setModalState(() => currency = v!),
                     ),
+                    const SizedBox(height: 12),
+                    TextFormField(
+                      controller: increaseRateCtrl,
+                      decoration: const InputDecoration(
+                        labelText: 'Zam Oranı (%)',
+                        hintText: 'Opsiyonel (0-100)',
+                        suffixText: '%',
+                      ),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) return null;
+                        final parsed = double.tryParse(v.trim());
+                        if (parsed == null) return 'Geçerli bir sayı girin';
+                        if (parsed < 0 || parsed > 100) return '0-100 arasında olmalıdır';
+                        return null;
+                      },
+                    ),
                     const SizedBox(height: 24),
                     FilledButton(
                       onPressed: () async {
                         if (!formKey.currentState!.validate()) return;
+                        final increaseRateText = increaseRateCtrl.text.trim();
                         final request = RentRequest(
                           realEstateId: int.parse(realEstateIdCtrl.text.trim()),
                           rentDate: DateFormat('yyyy-MM-dd').format(selectedDate),
                           rentAmount: double.parse(amountCtrl.text.trim()),
                           currency: currency,
+                          increaseRate: increaseRateText.isNotEmpty ? double.parse(increaseRateText) : null,
                         );
                         try {
                           if (rent != null) {
