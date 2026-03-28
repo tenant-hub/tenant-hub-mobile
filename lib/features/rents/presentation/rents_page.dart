@@ -112,6 +112,17 @@ class RentsPage extends ConsumerWidget {
                                       ],
                                     ],
                                   ),
+                                  const SizedBox(height: 4),
+                                  Row(
+                                    children: [
+                                      const Icon(Icons.event_available_outlined, size: 14, color: AppColors.textSecondary),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        DateFormat('dd.MM.yyyy').format(DateTime.parse(rent.paymentDueDate)),
+                                        style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
+                                      ),
+                                    ],
+                                  ),
                                   if (canUpdate || canDelete) ...[
                                     const Divider(height: 20),
                                     Row(
@@ -183,6 +194,7 @@ class RentsPage extends ConsumerWidget {
     );
     String currency = rent?.currency ?? 'TRY';
     DateTime selectedDate = rent != null ? DateTime.parse(rent.rentDate) : DateTime.now();
+    DateTime selectedPaymentDueDate = rent != null ? DateTime.parse(rent.paymentDueDate) : DateTime.now();
     final formKey = GlobalKey<FormState>();
 
     showModalBottomSheet(
@@ -224,6 +236,22 @@ class RentsPage extends ConsumerWidget {
                           lastDate: DateTime(2030),
                         );
                         if (picked != null) setModalState(() => selectedDate = picked);
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Son Ödeme Tarihi'),
+                      subtitle: Text(DateFormat('dd.MM.yyyy').format(selectedPaymentDueDate)),
+                      trailing: const Icon(Icons.event_available_outlined),
+                      onTap: () async {
+                        final picked = await showDatePicker(
+                          context: ctx,
+                          initialDate: selectedPaymentDueDate,
+                          firstDate: DateTime(2020),
+                          lastDate: DateTime(2030),
+                        );
+                        if (picked != null) setModalState(() => selectedPaymentDueDate = picked);
                       },
                     ),
                     const SizedBox(height: 12),
@@ -273,6 +301,7 @@ class RentsPage extends ConsumerWidget {
                           rentAmount: double.parse(amountCtrl.text.trim()),
                           currency: currency,
                           increaseRate: increaseRateText.isNotEmpty ? double.parse(increaseRateText) : null,
+                          paymentDueDate: DateFormat('yyyy-MM-dd').format(selectedPaymentDueDate),
                         );
                         try {
                           if (rent != null) {

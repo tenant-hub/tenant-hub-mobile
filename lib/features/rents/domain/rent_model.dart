@@ -13,6 +13,7 @@ class Rent with _$Rent {
     required double rentAmount,
     required String currency,
     double? increaseRate,
+    required String paymentDueDate,
     required String status,
     required String createdDate,
     required String createdBy,
@@ -29,6 +30,7 @@ class RentRequest with _$RentRequest {
     required double rentAmount,
     required String currency,
     double? increaseRate,
+    required String paymentDueDate,
   }) = _RentRequest;
 
   factory RentRequest.fromJson(Map<String, dynamic> json) =>
