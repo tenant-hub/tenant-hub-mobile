@@ -173,7 +173,30 @@ class RealEstatesPage extends ConsumerWidget {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, _) => Center(child: Text('Hata: ${e is ApiException ? e.message : 'Yüklenemedi'}')),
+            error: (e, _) => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(48),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.error_outline, size: 64, color: AppColors.error),
+                    const SizedBox(height: 16),
+                    Text(
+                      e is ApiException ? e.message : 'Gayrimenkuller yüklenemedi',
+                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    FilledButton.icon(
+                      onPressed: () => ref.read(realEstatesProvider.notifier).fetchRealEstates(),
+                      icon: const Icon(Icons.refresh, size: 18),
+                      label: const Text('Tekrar Dene'),
+                      style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ],
