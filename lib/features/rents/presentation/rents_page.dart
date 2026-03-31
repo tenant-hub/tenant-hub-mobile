@@ -11,14 +11,21 @@ import 'package:tenant_hub_mobile/shared/widgets/confirm_dialog.dart';
 import 'package:tenant_hub_mobile/shared/widgets/empty_state_widget.dart';
 import 'package:tenant_hub_mobile/shared/widgets/status_chip.dart';
 
-DateTime _parseDateString(String s) => DateTime(
-      int.parse(s.substring(0, 4)),
-      int.parse(s.substring(4, 6)),
-      int.parse(s.substring(6, 8)),
-      int.parse(s.substring(8, 10)),
-      int.parse(s.substring(10, 12)),
-      int.parse(s.substring(12, 14)),
-    );
+DateTime _parseDateString(String s) {
+  // ISO format: "2026-03-28T00:00:00" veya "2026-03-28T00:00:00.000Z"
+  if (s.contains('-') || s.contains('T')) {
+    return DateTime.parse(s);
+  }
+  // yyyyMMddHHmmss format: "20260328000000"
+  return DateTime(
+    int.parse(s.substring(0, 4)),
+    int.parse(s.substring(4, 6)),
+    int.parse(s.substring(6, 8)),
+    s.length >= 10 ? int.parse(s.substring(8, 10)) : 0,
+    s.length >= 12 ? int.parse(s.substring(10, 12)) : 0,
+    s.length >= 14 ? int.parse(s.substring(12, 14)) : 0,
+  );
+}
 
 class RentsPage extends ConsumerWidget {
   const RentsPage({super.key});
