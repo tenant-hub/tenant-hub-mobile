@@ -11,6 +11,15 @@ import 'package:tenant_hub_mobile/shared/widgets/confirm_dialog.dart';
 import 'package:tenant_hub_mobile/shared/widgets/empty_state_widget.dart';
 import 'package:tenant_hub_mobile/shared/widgets/status_chip.dart';
 
+DateTime _parseDateString(String s) => DateTime(
+      int.parse(s.substring(0, 4)),
+      int.parse(s.substring(4, 6)),
+      int.parse(s.substring(6, 8)),
+      int.parse(s.substring(8, 10)),
+      int.parse(s.substring(10, 12)),
+      int.parse(s.substring(12, 14)),
+    );
+
 class PaymentsPage extends ConsumerWidget {
   const PaymentsPage({super.key});
 
@@ -103,7 +112,7 @@ class PaymentsPage extends ConsumerWidget {
                                           size: 14, color: AppColors.textSecondary),
                                       const SizedBox(width: 4),
                                       Text(
-                                        DateFormat('dd.MM.yyyy').format(DateFormat('yyyyMMddHHmmss').parse(payment.paymentDate)),
+                                        DateFormat('dd.MM.yyyy').format(_parseDateString(payment.paymentDate)),
                                         style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                                       ),
                                     ],
@@ -175,7 +184,7 @@ class PaymentsPage extends ConsumerWidget {
     final rentIdCtrl = TextEditingController(text: payment?.rentId.toString());
     final amountCtrl = TextEditingController(text: payment?.amount.toString());
     String currency = payment?.currency ?? 'TRY';
-    DateTime selectedDate = payment != null ? DateFormat('yyyyMMddHHmmss').parse(payment.paymentDate) : DateTime.now();
+    DateTime selectedDate = payment != null ? _parseDateString(payment.paymentDate) : DateTime.now();
     final formKey = GlobalKey<FormState>();
 
     showModalBottomSheet(
