@@ -103,7 +103,7 @@ class PaymentsPage extends ConsumerWidget {
                                           size: 14, color: AppColors.textSecondary),
                                       const SizedBox(width: 4),
                                       Text(
-                                        DateFormat('dd.MM.yyyy').format(DateTime.parse(payment.paymentDate)),
+                                        DateFormat('dd.MM.yyyy').format(DateFormat('yyyyMMddHHmmss').parse(payment.paymentDate)),
                                         style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                                       ),
                                     ],
@@ -175,7 +175,7 @@ class PaymentsPage extends ConsumerWidget {
     final rentIdCtrl = TextEditingController(text: payment?.rentId.toString());
     final amountCtrl = TextEditingController(text: payment?.amount.toString());
     String currency = payment?.currency ?? 'TRY';
-    DateTime selectedDate = payment != null ? DateTime.parse(payment.paymentDate) : DateTime.now();
+    DateTime selectedDate = payment != null ? DateFormat('yyyyMMddHHmmss').parse(payment.paymentDate) : DateTime.now();
     final formKey = GlobalKey<FormState>();
 
     showModalBottomSheet(
@@ -246,7 +246,7 @@ class PaymentsPage extends ConsumerWidget {
                           rentId: int.parse(rentIdCtrl.text.trim()),
                           amount: double.parse(amountCtrl.text.trim()),
                           currency: currency,
-                          paymentDate: DateFormat('yyyy-MM-dd').format(selectedDate),
+                          paymentDate: DateFormat('yyyyMMddHHmmss').format(selectedDate),
                         );
                         try {
                           if (payment != null) {

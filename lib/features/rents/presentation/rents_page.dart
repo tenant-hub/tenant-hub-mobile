@@ -98,7 +98,7 @@ class RentsPage extends ConsumerWidget {
                                       const Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.textSecondary),
                                       const SizedBox(width: 4),
                                       Text(
-                                        DateFormat('dd.MM.yyyy').format(DateTime.parse(rent.rentDate)),
+                                        DateFormat('dd.MM.yyyy').format(DateFormat('yyyyMMddHHmmss').parse(rent.rentDate)),
                                         style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                                       ),
                                       if (rent.increaseRate != null) ...[
@@ -118,7 +118,7 @@ class RentsPage extends ConsumerWidget {
                                       const Icon(Icons.event_available_outlined, size: 14, color: AppColors.textSecondary),
                                       const SizedBox(width: 4),
                                       Text(
-                                        DateFormat('dd.MM.yyyy').format(DateTime.parse(rent.paymentDueDate)),
+                                        DateFormat('dd.MM.yyyy').format(DateFormat('yyyyMMddHHmmss').parse(rent.paymentDueDate)),
                                         style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                                       ),
                                     ],
@@ -194,8 +194,8 @@ class RentsPage extends ConsumerWidget {
     );
     final noteCtrl = TextEditingController(text: rent?.note);
     String currency = rent?.currency ?? 'TRY';
-    DateTime selectedDate = rent != null ? DateTime.parse(rent.rentDate) : DateTime.now();
-    DateTime selectedPaymentDueDate = rent != null ? DateTime.parse(rent.paymentDueDate) : DateTime.now();
+    DateTime selectedDate = rent != null ? DateFormat('yyyyMMddHHmmss').parse(rent.rentDate) : DateTime.now();
+    DateTime selectedPaymentDueDate = rent != null ? DateFormat('yyyyMMddHHmmss').parse(rent.paymentDueDate) : DateTime.now();
     final formKey = GlobalKey<FormState>();
 
     showModalBottomSheet(
@@ -313,11 +313,11 @@ class RentsPage extends ConsumerWidget {
                         final increaseRateText = increaseRateCtrl.text.trim();
                         final request = RentRequest(
                           realEstateId: int.parse(realEstateIdCtrl.text.trim()),
-                          rentDate: DateFormat('yyyy-MM-dd').format(selectedDate),
+                          rentDate: DateFormat('yyyyMMddHHmmss').format(selectedDate),
                           rentAmount: double.parse(amountCtrl.text.trim()),
                           currency: currency,
                           increaseRate: increaseRateText.isNotEmpty ? double.parse(increaseRateText) : null,
-                          paymentDueDate: DateFormat('yyyy-MM-dd').format(selectedPaymentDueDate),
+                          paymentDueDate: DateFormat('yyyyMMddHHmmss').format(selectedPaymentDueDate),
                           note: noteCtrl.text.trim().isNotEmpty ? noteCtrl.text.trim() : null,
                         );
                         try {
