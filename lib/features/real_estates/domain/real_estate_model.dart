@@ -8,7 +8,7 @@ class RealEstate with _$RealEstate {
   const factory RealEstate({
     required int id,
     required String name,
-    required String description,
+    String? description,
     required String type,
     required String province,
     required String district,
