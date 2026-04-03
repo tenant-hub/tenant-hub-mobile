@@ -1,32 +1,386 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tenant_hub_mobile/core/constants/app_colors.dart';
+import 'package:tenant_hub_mobile/core/constants/permission_keys.dart';
+import 'package:tenant_hub_mobile/core/network/api_exceptions.dart';
+import 'package:tenant_hub_mobile/features/auth/presentation/auth_provider.dart';
+import 'package:tenant_hub_mobile/features/tenants/domain/tenant_model.dart';
+import 'package:tenant_hub_mobile/features/tenants/presentation/tenants_provider.dart';
+import 'package:tenant_hub_mobile/features/users/data/user_repository.dart';
+import 'package:tenant_hub_mobile/features/users/domain/user_model.dart';
+import 'package:tenant_hub_mobile/features/users/presentation/users_provider.dart';
+import 'package:tenant_hub_mobile/shared/widgets/confirm_dialog.dart';
+import 'package:tenant_hub_mobile/shared/widgets/empty_state_widget.dart';
 
-class TenantsPage extends StatelessWidget {
+class TenantsPage extends ConsumerWidget {
   const TenantsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.group_outlined,
-              size: 80, color: AppColors.textSecondary.withValues(alpha: 0.3)),
-          const SizedBox(height: 16),
-          const Text(
-            'Kiracılar',
-            style: TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(tenantsProvider);
+    final authNotifier = ref.read(authProvider.notifier);
+    final canCreate = authNotifier.hasPermission(PermissionKeys.tenantCreate);
+    final canUpdate = authNotifier.hasPermission(PermissionKeys.tenantUpdate);
+    final canDelete = authNotifier.hasPermission(PermissionKeys.tenantDelete);
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text('Kiracılar',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
+              if (canCreate)
+                FilledButton.icon(
+                  onPressed: () => _showFormDialog(context, ref),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Yeni'),
+                  style:
+                      FilledButton.styleFrom(backgroundColor: AppColors.primary),
+                ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: state.when(
+            data: (pageResponse) {
+              if (pageResponse.content.isEmpty) {
+                return const EmptyStateWidget(
+                    icon: Icons.group_outlined, message: 'Kiracı bulunamadı');
+              }
+              return RefreshIndicator(
+                onRefresh: () =>
+                    ref.read(tenantsProvider.notifier).fetchTenants(),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: pageResponse.content.length,
+                        itemBuilder: (context, index) {
+                          final tenant = pageResponse.content[index];
+                          final displayName = _buildDisplayName(tenant);
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundColor: AppColors.primary
+                                            .withValues(alpha: 0.1),
+                                        child: const Icon(Icons.person,
+                                            color: AppColors.primary, size: 20),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(displayName,
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 15)),
+                                            if (tenant.username != null)
+                                              Text('@${tenant.username}',
+                                                  style: const TextStyle(
+                                                      color: AppColors
+                                                          .textSecondary,
+                                                      fontSize: 13)),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  if (canUpdate || canDelete) ...[
+                                    const Divider(height: 20),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        if (canUpdate)
+                                          TextButton.icon(
+                                            onPressed: () => _showFormDialog(
+                                                context, ref,
+                                                tenant: tenant),
+                                            icon: const Icon(
+                                                Icons.edit_outlined,
+                                                size: 16),
+                                            label: const Text('Düzenle'),
+                                            style: TextButton.styleFrom(
+                                                foregroundColor: AppColors.info),
+                                          ),
+                                        if (canDelete)
+                                          TextButton.icon(
+                                            onPressed: () => _handleDelete(
+                                                context, ref, tenant),
+                                            icon: const Icon(
+                                                Icons.delete_outline,
+                                                size: 16),
+                                            label: const Text('Sil'),
+                                            style: TextButton.styleFrom(
+                                                foregroundColor:
+                                                    AppColors.error),
+                                          ),
+                                      ],
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    if (pageResponse.totalPages > 1)
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              onPressed: pageResponse.number > 0
+                                  ? () => ref
+                                      .read(tenantsProvider.notifier)
+                                      .setPage(pageResponse.number - 1)
+                                  : null,
+                              icon: const Icon(Icons.chevron_left),
+                            ),
+                            Text(
+                                '${pageResponse.number + 1} / ${pageResponse.totalPages}'),
+                            IconButton(
+                              onPressed: pageResponse.number <
+                                      pageResponse.totalPages - 1
+                                  ? () => ref
+                                      .read(tenantsProvider.notifier)
+                                      .setPage(pageResponse.number + 1)
+                                  : null,
+                              icon: const Icon(Icons.chevron_right),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Center(
+              child: Padding(
+                padding: const EdgeInsets.all(48),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.error_outline,
+                        size: 64, color: AppColors.error),
+                    const SizedBox(height: 16),
+                    Text(
+                      e is ApiException
+                          ? e.message
+                          : 'Kiracılar yüklenemedi',
+                      style: const TextStyle(
+                          color: AppColors.textSecondary, fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    FilledButton.icon(
+                      onPressed: () =>
+                          ref.read(tenantsProvider.notifier).fetchTenants(),
+                      icon: const Icon(Icons.refresh, size: 18),
+                      label: const Text('Tekrar Dene'),
+                      style: FilledButton.styleFrom(
+                          backgroundColor: AppColors.primary),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 8),
-          const Text(
-            'Bu sayfa yakında eklenecektir.',
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 15),
+        ),
+      ],
+    );
+  }
+
+  String _buildDisplayName(Tenant tenant) {
+    final firstName = tenant.firstName ?? '';
+    final lastName = tenant.lastName ?? '';
+    final fullName = '$firstName $lastName'.trim();
+    if (fullName.isNotEmpty) return fullName;
+    if (tenant.username != null) return tenant.username!;
+    return 'Kiracı #${tenant.id}';
+  }
+
+  void _showFormDialog(BuildContext context, WidgetRef ref,
+      {Tenant? tenant}) async {
+    final userRepo = ref.read(userRepositoryProvider);
+    List<User> users = [];
+
+    try {
+      final page = await userRepo.getUsers(size: 100, sort: 'username,asc');
+      users = page.content;
+    } catch (_) {}
+
+    if (!context.mounted) return;
+
+    int? selectedUserId = tenant?.usersId;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      builder: (ctx) => _TenantFormSheet(
+        tenant: tenant,
+        users: users,
+        initialUserId: selectedUserId,
+        onSubmit: (usersId) async {
+          final request = TenantRequest(usersId: usersId);
+          try {
+            if (tenant != null) {
+              await ref
+                  .read(tenantsProvider.notifier)
+                  .updateTenant(tenant.id, request);
+            } else {
+              await ref.read(tenantsProvider.notifier).createTenant(request);
+            }
+            if (ctx.mounted) Navigator.of(ctx).pop();
+          } catch (e) {
+            if (ctx.mounted) {
+              ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(
+                content:
+                    Text(e is ApiException ? e.message : 'İşlem başarısız'),
+                backgroundColor: AppColors.error,
+              ));
+            }
+          }
+        },
+      ),
+    );
+  }
+
+  Future<void> _handleDelete(
+      BuildContext context, WidgetRef ref, Tenant tenant) async {
+    final displayName = _buildDisplayName(tenant);
+    final confirmed = await showConfirmDialog(context,
+        title: 'Kiracıyı Sil',
+        message: '$displayName kiracısını silmek istediğinize emin misiniz?');
+    if (confirmed) {
+      try {
+        await ref.read(tenantsProvider.notifier).deleteTenant(tenant.id);
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(e is ApiException ? e.message : 'Silinemedi'),
+            backgroundColor: AppColors.error,
+          ));
+        }
+      }
+    }
+  }
+}
+
+class _TenantFormSheet extends StatefulWidget {
+  final Tenant? tenant;
+  final List<User> users;
+  final int? initialUserId;
+  final Future<void> Function(int usersId) onSubmit;
+
+  const _TenantFormSheet({
+    this.tenant,
+    required this.users,
+    this.initialUserId,
+    required this.onSubmit,
+  });
+
+  @override
+  State<_TenantFormSheet> createState() => _TenantFormSheetState();
+}
+
+class _TenantFormSheetState extends State<_TenantFormSheet> {
+  int? _selectedUserId;
+  bool _isLoading = false;
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedUserId = widget.initialUserId;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        child: Form(
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  widget.tenant != null ? 'Kiracı Düzenle' : 'Yeni Kiracı',
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 20),
+                if (widget.users.isEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.error.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'Kullanıcı listesi yüklenemedi. Lütfen tekrar deneyin.',
+                      style: TextStyle(color: AppColors.error, fontSize: 13),
+                    ),
+                  )
+                else
+                  DropdownButtonFormField<int>(
+                    value: _selectedUserId,
+                    decoration: const InputDecoration(labelText: 'Kullanıcı'),
+                    items: widget.users
+                        .map((u) => DropdownMenuItem<int>(
+                              value: u.id,
+                              child: Text(
+                                '${u.firstName} ${u.lastName} (@${u.username})',
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ))
+                        .toList(),
+                    onChanged: (v) => setState(() => _selectedUserId = v),
+                    validator: (v) => v == null ? 'Kullanıcı seçiniz' : null,
+                  ),
+                const SizedBox(height: 24),
+                FilledButton(
+                  onPressed: _isLoading
+                      ? null
+                      : () async {
+                          if (!_formKey.currentState!.validate()) return;
+                          setState(() => _isLoading = true);
+                          await widget.onSubmit(_selectedUserId!);
+                          if (mounted) setState(() => _isLoading = false);
+                        },
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Text(widget.tenant != null ? 'Güncelle' : 'Oluştur'),
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
     );
   }
