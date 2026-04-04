@@ -6,6 +6,7 @@ import 'package:tenant_hub_mobile/core/network/api_exceptions.dart';
 import 'package:tenant_hub_mobile/features/auth/presentation/auth_provider.dart';
 import 'package:tenant_hub_mobile/features/permissions/domain/permission_model.dart';
 import 'package:tenant_hub_mobile/features/permissions/presentation/permissions_provider.dart';
+import 'package:tenant_hub_mobile/core/utils/text_utils.dart';
 import 'package:tenant_hub_mobile/shared/widgets/confirm_dialog.dart';
 import 'package:tenant_hub_mobile/shared/widgets/empty_state_widget.dart';
 import 'package:tenant_hub_mobile/shared/widgets/status_chip.dart';
@@ -63,8 +64,8 @@ class PermissionsPage extends ConsumerWidget {
                                 backgroundColor: AppColors.info.withValues(alpha: 0.1),
                                 child: const Icon(Icons.security, color: AppColors.info, size: 20),
                               ),
-                              title: Text(perm.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-                              subtitle: Text('${perm.module} / ${perm.action}', style: const TextStyle(fontSize: 12)),
+                              title: Text(TextUtils.truncate(perm.name), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                              subtitle: Text(TextUtils.truncate('${perm.module} / ${perm.action}'), style: const TextStyle(fontSize: 12)),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [

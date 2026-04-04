@@ -8,6 +8,7 @@ import 'package:tenant_hub_mobile/features/users/domain/user_model.dart';
 import 'package:tenant_hub_mobile/features/users/presentation/user_form_dialog.dart';
 import 'package:tenant_hub_mobile/features/users/presentation/user_roles_sheet.dart';
 import 'package:tenant_hub_mobile/features/users/presentation/users_provider.dart';
+import 'package:tenant_hub_mobile/core/utils/text_utils.dart';
 import 'package:tenant_hub_mobile/shared/widgets/confirm_dialog.dart';
 import 'package:tenant_hub_mobile/shared/widgets/empty_state_widget.dart';
 import 'package:tenant_hub_mobile/shared/widgets/status_chip.dart';
@@ -397,14 +398,14 @@ class _UserCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        user.username,
+                        TextUtils.truncate(user.username),
                         style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 15,
                         ),
                       ),
                       Text(
-                        '${user.firstName} ${user.lastName}',
+                        TextUtils.truncate('${user.firstName} ${user.lastName}'),
                         style: const TextStyle(
                           color: AppColors.textSecondary,
                           fontSize: 13,
@@ -422,7 +423,7 @@ class _UserCard extends StatelessWidget {
                 const Icon(Icons.email_outlined, size: 14, color: AppColors.textSecondary),
                 const SizedBox(width: 4),
                 Text(
-                  user.email,
+                  TextUtils.truncate(user.email),
                   style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                 ),
                 if (user.phone.isNotEmpty) ...[
@@ -430,7 +431,7 @@ class _UserCard extends StatelessWidget {
                   const Icon(Icons.phone_outlined, size: 14, color: AppColors.textSecondary),
                   const SizedBox(width: 4),
                   Text(
-                    user.phone,
+                    TextUtils.truncate(user.phone),
                     style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                   ),
                 ],

@@ -7,6 +7,7 @@ import 'package:tenant_hub_mobile/features/auth/presentation/auth_provider.dart'
 import 'package:tenant_hub_mobile/features/roles/domain/role_model.dart';
 import 'package:tenant_hub_mobile/features/roles/presentation/role_permissions_sheet.dart';
 import 'package:tenant_hub_mobile/features/roles/presentation/roles_provider.dart';
+import 'package:tenant_hub_mobile/core/utils/text_utils.dart';
 import 'package:tenant_hub_mobile/shared/widgets/confirm_dialog.dart';
 import 'package:tenant_hub_mobile/shared/widgets/empty_state_widget.dart';
 import 'package:tenant_hub_mobile/shared/widgets/status_chip.dart';
@@ -69,8 +70,8 @@ class _RolesPageState extends ConsumerState<RolesPage> {
                                 backgroundColor: AppColors.warning.withValues(alpha: 0.1),
                                 child: const Icon(Icons.star, color: AppColors.warning, size: 20),
                               ),
-                              title: Text(role.name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                              subtitle: Text(role.description, maxLines: 1, overflow: TextOverflow.ellipsis),
+                              title: Text(TextUtils.truncate(role.name), style: const TextStyle(fontWeight: FontWeight.w600)),
+                              subtitle: Text(TextUtils.truncate(role.description), maxLines: 1, overflow: TextOverflow.ellipsis),
                               trailing: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [

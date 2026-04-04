@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tenant_hub_mobile/core/constants/app_colors.dart';
+import 'package:tenant_hub_mobile/core/utils/text_utils.dart';
 import 'package:tenant_hub_mobile/features/auth/presentation/auth_provider.dart';
 
 class SettingsPage extends ConsumerWidget {
@@ -49,7 +50,7 @@ class SettingsPage extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          user?.username ?? '',
+                          TextUtils.truncate(user?.username ?? ''),
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,

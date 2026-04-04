@@ -9,6 +9,7 @@ import 'package:tenant_hub_mobile/features/landlords/presentation/landlords_prov
 import 'package:tenant_hub_mobile/features/users/data/user_repository.dart';
 import 'package:tenant_hub_mobile/features/users/domain/user_model.dart';
 import 'package:tenant_hub_mobile/features/users/presentation/users_provider.dart';
+import 'package:tenant_hub_mobile/core/utils/text_utils.dart';
 import 'package:tenant_hub_mobile/shared/widgets/confirm_dialog.dart';
 import 'package:tenant_hub_mobile/shared/widgets/empty_state_widget.dart';
 
@@ -81,7 +82,7 @@ class LandlordsPage extends ConsumerWidget {
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Text(
-                                          displayName,
+                                          TextUtils.truncate(displayName),
                                           style: const TextStyle(
                                               fontWeight: FontWeight.w600,
                                               fontSize: 15),

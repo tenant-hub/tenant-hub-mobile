@@ -6,6 +6,7 @@ import 'package:tenant_hub_mobile/core/network/api_exceptions.dart';
 import 'package:tenant_hub_mobile/features/auth/presentation/auth_provider.dart';
 import 'package:tenant_hub_mobile/features/real_estates/domain/real_estate_model.dart';
 import 'package:tenant_hub_mobile/features/real_estates/presentation/real_estates_provider.dart';
+import 'package:tenant_hub_mobile/core/utils/text_utils.dart';
 import 'package:tenant_hub_mobile/shared/widgets/confirm_dialog.dart';
 import 'package:tenant_hub_mobile/shared/widgets/empty_state_widget.dart';
 import 'package:tenant_hub_mobile/shared/widgets/status_chip.dart';
@@ -74,8 +75,8 @@ class RealEstatesPage extends ConsumerWidget {
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text(re.name, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
-                                            Text(re.type, style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+                                            Text(TextUtils.truncate(re.name), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+                                            Text(TextUtils.truncate(re.type), style: const TextStyle(color: AppColors.textSecondary, fontSize: 13)),
                                           ],
                                         ),
                                       ),
@@ -89,7 +90,7 @@ class RealEstatesPage extends ConsumerWidget {
                                       const SizedBox(width: 4),
                                       Expanded(
                                         child: Text(
-                                          '${re.province}, ${re.district}',
+                                          TextUtils.truncate('${re.province}, ${re.district}'),
                                           style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -104,14 +105,14 @@ class RealEstatesPage extends ConsumerWidget {
                                           if (re.landlordName != null) ...[
                                             const Icon(Icons.person, size: 14, color: AppColors.textSecondary),
                                             const SizedBox(width: 4),
-                                            Text('Ev sahibi: ${re.landlordName}',
+                                            Text('Ev sahibi: ${TextUtils.truncate(re.landlordName!)}',
                                                 style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                                           ],
                                           if (re.tenantName != null) ...[
                                             const SizedBox(width: 12),
                                             const Icon(Icons.group, size: 14, color: AppColors.textSecondary),
                                             const SizedBox(width: 4),
-                                            Text('Kiracı: ${re.tenantName}',
+                                            Text('Kiracı: ${TextUtils.truncate(re.tenantName!)}',
                                                 style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                                           ],
                                         ],
@@ -127,7 +128,7 @@ class RealEstatesPage extends ConsumerWidget {
                                           const SizedBox(width: 4),
                                           Expanded(
                                             child: Text(
-                                              re.note!,
+                                              TextUtils.truncate(re.note!),
                                               style: const TextStyle(fontSize: 13, color: AppColors.textSecondary),
                                             ),
                                           ),

@@ -7,6 +7,7 @@ import 'package:tenant_hub_mobile/core/network/api_exceptions.dart';
 import 'package:tenant_hub_mobile/features/auth/presentation/auth_provider.dart';
 import 'package:tenant_hub_mobile/features/rents/domain/rent_model.dart';
 import 'package:tenant_hub_mobile/features/rents/presentation/rents_provider.dart';
+import 'package:tenant_hub_mobile/core/utils/text_utils.dart';
 import 'package:tenant_hub_mobile/shared/widgets/confirm_dialog.dart';
 import 'package:tenant_hub_mobile/shared/widgets/empty_state_widget.dart';
 import 'package:tenant_hub_mobile/shared/widgets/status_chip.dart';
@@ -97,7 +98,7 @@ class RentsPage extends ConsumerWidget {
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
-                                            Text(rent.realEstateName, style: const TextStyle(fontWeight: FontWeight.w600)),
+                                            Text(TextUtils.truncate(rent.realEstateName), style: const TextStyle(fontWeight: FontWeight.w600)),
                                             Text(
                                               _formatCurrency(rent.rentAmount, rent.currency),
                                               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: AppColors.primary),

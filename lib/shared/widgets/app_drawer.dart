@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:tenant_hub_mobile/core/constants/app_colors.dart';
 import 'package:tenant_hub_mobile/core/constants/permission_keys.dart';
+import 'package:tenant_hub_mobile/core/utils/text_utils.dart';
 import 'package:tenant_hub_mobile/features/auth/presentation/auth_provider.dart';
 
 class _MenuItem {
@@ -199,7 +200,7 @@ class AppDrawer extends ConsumerWidget {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        user?.username ?? '',
+                        TextUtils.truncate(user?.username ?? ''),
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.w500,

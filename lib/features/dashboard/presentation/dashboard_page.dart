@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tenant_hub_mobile/core/constants/app_colors.dart';
+import 'package:tenant_hub_mobile/core/utils/text_utils.dart';
 import 'package:tenant_hub_mobile/features/auth/presentation/auth_provider.dart';
 import 'package:tenant_hub_mobile/features/dashboard/presentation/dashboard_provider.dart';
 
@@ -21,7 +22,7 @@ class DashboardPage extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Hoş geldiniz, ${username ?? ''}',
+              'Hoş geldiniz, ${TextUtils.truncate(username ?? '')}',
               style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,

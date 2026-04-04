@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tenant_hub_mobile/core/constants/app_colors.dart';
 import 'package:tenant_hub_mobile/core/network/api_exceptions.dart';
+import 'package:tenant_hub_mobile/core/utils/text_utils.dart';
 import 'package:tenant_hub_mobile/features/roles/presentation/roles_provider.dart';
 import 'package:tenant_hub_mobile/features/users/domain/user_model.dart';
 import 'package:tenant_hub_mobile/features/users/domain/user_role_model.dart';
@@ -113,7 +114,7 @@ class _UserRolesSheetState extends ConsumerState<UserRolesSheet> {
               children: [
                 Expanded(
                   child: Text(
-                    '${widget.user.username} — Rol Yönetimi',
+                    '${TextUtils.truncate(widget.user.username)} — Rol Yönetimi',
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                     overflow: TextOverflow.ellipsis,
                   ),
