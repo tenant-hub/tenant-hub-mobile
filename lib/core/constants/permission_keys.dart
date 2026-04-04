@@ -42,4 +42,10 @@ class PermissionKeys {
   static const String tenantCreate = 'TENANT_CREATE';
   static const String tenantUpdate = 'TENANT_UPDATE';
   static const String tenantDelete = 'TENANT_DELETE';
+
+  // Landlord
+  static const String landlordRead = 'LANDLORD_READ';
+  static const String landlordCreate = 'LANDLORD_CREATE';
+  static const String landlordUpdate = 'LANDLORD_UPDATE';
+  static const String landlordDelete = 'LANDLORD_DELETE';
 }
