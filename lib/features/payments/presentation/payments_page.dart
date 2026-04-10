@@ -279,6 +279,9 @@ class PaymentsPage extends ConsumerWidget {
                       maxLength: 1000,
                       maxLines: 3,
                       keyboardType: TextInputType.multiline,
+                      buildCounter: (context, {required currentLength, required isFocused, maxLength}) =>
+                          Text('$currentLength/$maxLength',
+                              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                     ),
                     const SizedBox(height: 24),
                     FilledButton(
